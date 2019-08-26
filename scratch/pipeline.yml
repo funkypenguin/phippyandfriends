@@ -4,15 +4,16 @@ resources:
     type: git
     icon: github-circle
     source:
-      uri: https://github.com/funkypenguin/phippyandfriends
+      uri: https://github.com/funkypenguin/phippyandfriends.git
 
   - name: harbour
-    type: docker-image
+    type: registry-image
     icon: github-circle
     source:
-      uri: https://registry-internal.elpenguino.net
       username: Harbor
-      password: 12345
+      password: "12345"
+      debug: true
+      repository: registry-internal.elpenguino.net:library/scratch
 
 jobs:
   - name: job
@@ -29,18 +30,20 @@ jobs:
           platform: linux
           image_resource:
             type: docker-image
-            source: {repository: gcr.io/kaniko-project/executor:debug}  
+            source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
           run:
-            path: /bin/ls
-            args:
-              - -la
-            #  path: /kaniko/executor
-            #  args:
-            #    - --dockerfile=/phippyandfriends-git/scratch/Dockerfile
-            #    - "--destination=doesnt/matter:test"
-            #    - --context=/tmp/build/e55deab7/source
-            #    - --tarPath=/tmp/build/e55deab7/image/image.tar     
+             path: sh
+             args:     
+                - -c       
+                - | 
+                  DIR=`ls /tmp/build/` && \
+                  /kaniko/executor  \
+                  --dockerfile=/tmp/build/$DIR/phippyandfriends-git/scratch/Dockerfile \
+                  --destination=doesnt/matter:we-are-not-pushing \
+                  --context=/tmp/build/$DIR/phippyandfriends-git/scratch/ \
+                  --no-push                \
+                  --tarPath=/tmp/build/$DIR/image/image.tar
 
       - put: harbour
-        inputs:
-          - image 
+        params:
+          image: image/image.tar
