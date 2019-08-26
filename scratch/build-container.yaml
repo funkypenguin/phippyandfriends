@@ -1,0 +1,17 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source: {repository: gcr.io/kaniko-project/executor}
+inputs:
+- name: source
+outputs:
+- name: image
+run:
+  path: /kaniko/executor
+  args:
+    - --dockerfile=/tmp/build/e55deab7/source/Dockerfile
+    - --destination=doesnt/matter:test
+    - --no-push
+    - --context=/tmp/build/e55deab7/source
+    - --tarPath=/tmp/build/e55deab7/image/image.tar
