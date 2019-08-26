@@ -8,12 +8,12 @@ resources:
 
   - name: harbour
     type: registry-image
-    icon: github-circle
+    icon: pier-crane
     source:
-      username: Harbor
-      password: "12345"
+      username: admin
+      password: Harbor12345
       debug: true
-      repository: registry-internal.elpenguino.net:library/scratch
+      repository: registry-internal.elpenguino.net/library/scratch
 
 jobs:
   - name: job
