@@ -15,5 +15,6 @@ run:
         --set buildID=`cat git-source/.git/ref` \
         --set image.repository=((registry-url))/((component)) \
         --set image.tag=`cat git-source/.git/ref` \
+        --name ((component)) \
         --output-dir=helm-generated-manifest \
         git-source/((component))/charts/((component))
