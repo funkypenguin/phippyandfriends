@@ -51,7 +51,7 @@ jobs:
             type: docker-image
             source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
           run:
-             path: git-source/ci/build-with-kaniko.sh
+             path: ./git-source/ci/build-with-kaniko.sh
           params:
             COMPONENT: ((component))
 
