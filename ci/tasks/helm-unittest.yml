@@ -9,5 +9,6 @@ run:
   args:
     - -c 
     - |
+      helm init --client-only
       helm plugin install https://github.com/lrills/helm-unittest
       helm unittest git-source/((component))/charts/((component))

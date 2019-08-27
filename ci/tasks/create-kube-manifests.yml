@@ -14,6 +14,6 @@ args:
      helm template \
         --set buildID=bananapants \
         --set image.repository=((registry-url))/((component)) \
-        --set image.tag=latest \
+        --set image.tag=`cat git-source/.git/ref` \
         --output-dir=helm-generated-manifest \
         git-source/((component))/charts/((component))
