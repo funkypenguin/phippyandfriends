@@ -35,7 +35,6 @@ resources:
       debug: true
       repository: ((registry-url))/((component))
 
-
 jobs:
   - name: job
     public: true
@@ -61,7 +60,7 @@ jobs:
         vars: { component: ((component)) }
 
       # This task runs "helm unittest" against the helm chart found in <git-source>/<component>/charts/<component> directory.
-      - task: helm lint chart
+      - task: helm unittest chart
         file: git-source/ci/tasks/helm-unittest.yml      
         vars: { component: ((component)) }
 
