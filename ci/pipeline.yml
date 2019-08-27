@@ -18,7 +18,7 @@ resources:
   # This is the kube cluster we'll be controlling
   - name: kube-cluster
     type: kubernetes
-    icon: kubernetes
+    icon: server-network
     source:
       server: ((kubernetes-url))
       namespace: dev
