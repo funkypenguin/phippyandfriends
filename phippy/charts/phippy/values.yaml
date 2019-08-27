@@ -9,5 +9,6 @@ service:
   externalPort: 80
   internalPort: 3333
 ingress:
-  enabled: false
+  enabled: true
+  class: addon-http-application-routing  
   #basedomain: CHANGE_TO_YOUR_DNS.REGION.aksapp.io # replace with your own from the portal # replace with your own from the portal

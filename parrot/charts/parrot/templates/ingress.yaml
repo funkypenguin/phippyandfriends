@@ -10,6 +10,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
   - host: {{ .Release.Name }}.{{ .Values.ingress.basedomain }}

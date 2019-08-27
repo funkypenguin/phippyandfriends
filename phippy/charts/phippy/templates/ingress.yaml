@@ -9,7 +9,8 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
   annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
   - host: {{ .Release.Name }}.{{ .Values.ingress.basedomain }}
@@ -19,4 +20,8 @@ spec:
         backend:
           serviceName: {{ template "fullname" . }}
           servicePort: {{ .Values.service.externalPort }}
+  tls:
+  - hosts:
+    - {{ .Release.Name }}.{{ .Values.ingress.basedomain }}
+    secretName: {{ .Release.Name }}-tls           
 {{- end -}}
