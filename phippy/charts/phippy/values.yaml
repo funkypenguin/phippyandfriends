@@ -7,7 +7,7 @@ image:
   pullPolicy: IfNotPresent
 service:
   externalPort: 80
-  internalPort: 3333
+  internalPort: 80
 ingress:
   enabled: true
   class: addon-http-application-routing  
