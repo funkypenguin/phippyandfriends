@@ -17,19 +17,19 @@ resources:
     type: kubernetes
     icon: kubernetes
     source:
-      server: {{kubernetes-url}}
+      server: ((kubernetes-url))
       namespace: dev
-      token: {{kubernetes-token}}
-      certificate_authority: {{kubernetes-cert}}
+      token: ((kubernetes-token))
+      certificate_authority: ((kubernetes-cert))
 
   - name: harbour
     type: registry-image
     icon: pier-crane
     source:
-      username: {{registry-username}}
-      password: {{registry-password}}
+      username: ((registry-username))
+      password: ((registry-password))
       debug: true
-      repository: registry-internal.elpenguino.net/library/phippy
+      repository: ((registry-url))/((component))
 
 
 jobs:
@@ -41,20 +41,9 @@ jobs:
 
       # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component directory.
       - task: build-image
-        config:
-          inputs:
-            - name: git-source
-          outputs:
-            - name: image            
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
-          run:
-             path: ./git-source/ci/build-with-kaniko.sh
-          params:
-            COMPONENT: ((component))
+        file: git-source/ci/build-with-kaniko.yml
 
+      # This task uploads the image generated above into the registry
       - put: harbour
         params:
           image: image/image.tar
