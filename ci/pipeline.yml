@@ -57,31 +57,25 @@ jobs:
 
       # This task runs "helm lint" against the helm chart found in <git-source>/<component>/charts/<component> directory.
       - task: helm lint chart
-        file: git-source/ci/tasks/helm-lint.yml
+        file: git-source/ci/tasks/helm-lint.yml      
+        vars: { component: ((component)) }
+
+      # This task runs "helm unittest" against the helm chart found in <git-source>/<component>/charts/<component> directory.
+      - task: helm lint chart
+        file: git-source/ci/tasks/helm-unittest.yml      
         vars: { component: ((component)) }
 
       # This task uses helm to generate kubernetes manifests from the supplied chart and values
       - task: create manifests from chart
-        file: git-source/ci/tasks/helm-lint.yml
+        file: git-source/ci/tasks/create-kube-manifests.yml
         vars: 
           component: ((component))
           registry-url: ((registry-url))
 
-      - task: kubeval manifest
-        config:
-          inputs: 
-            - name: helm-generated-manifest
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: { repository: garethr/kubeval }
-          run: 
-            path: kubeval 
-            args:
-              - -d
-              - helm-generated-manifest
-
-
+      # This task runs "helm lint" against the helm chart found in <git-source>/<component>/charts/<component> directory.
+      - task: kubeval manifests
+        file: git-source/ci/tasks/kubeval-manifests.yml
+        
       - put: kube-cluster 
         params:
           kubectl: apply -f helm-generated-manifest/((component))/templates

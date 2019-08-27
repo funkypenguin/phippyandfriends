@@ -1,13 +1,12 @@
+
 inputs: 
-  - name: git-source
+  - name: helm-generated-manifest
 platform: linux
 image_resource:
   type: docker-image
-  source: { repository: dtzar/helm-kubectl }
+  source: { repository: garethr/kubeval }
 run: 
-  path: /bin/ash 
+  path: kubeval 
   args:
-    - -c 
-    - |
-      helm plugin install https://github.com/lrills/helm-unittest
-      helm unittest git-source/((component))/charts/((component))
+    - -d
+    - helm-generated-manifest
