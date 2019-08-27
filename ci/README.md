@@ -1,5 +1,7 @@
 # CI using Concourse-CI
 
+[![concourse.elpenguino.net](https://concourse.elpenguino.net/api/v1/pipelines/phippy/jobs/launch-phippy/badge)]
+
 This folder presents examples for using ConcourseCI for:
 
 1. Build of the various Docker images using Kaniko (for avoiding docker and Docker-in-Docker)

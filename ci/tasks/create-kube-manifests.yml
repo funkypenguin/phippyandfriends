@@ -11,9 +11,9 @@ run:
   args:
     - -c
     - |
-    helm template \
-      --set buildID=bananapants \
-      --set image.repository=((registry-url))/((component)) \
-      --set image.tag=`cat git-source/.git/ref` \
-      --output-dir=helm-generated-manifest \
-      git-source/((component))/charts/((component))
+      helm template \
+        --set buildID=`cat git-source/.git/ref` \
+        --set image.repository=((registry-url))/((component)) \
+        --set image.tag=`cat git-source/.git/ref` \
+        --output-dir=helm-generated-manifest \
+        git-source/((component))/charts/((component))

@@ -32,11 +32,11 @@ resources:
     source:
       username: ((registry-username))
       password: ((registry-password))
-      debug: true
+      debug: false
       repository: ((registry-url))/((component))
 
 jobs:
-  - name: job
+  - name: launch-((component))
     public: true
     plan:
       # Get the git source
