@@ -12,14 +12,14 @@ This folder presents examples for using ConcourseCI for:
 
 1. Create service account `concourse` in namespace `dev` by running `kubectl apply -f dev-rbac.yml`
 2. Extract the service account token by running `./create-kubeconfig.sh concourse --namespace dev`
-3. Copy `credentials.yml-example` to `credentials.yml` and populate with your kube CA cert (*found in `/etc/kubernetes/pki/ca.crt` on kubeadm-built master nodes*), token (*extracted above*), and URL to API endpoint (*also can be extracted from the kubeconfig generated above*)
+3. Copy `vars.yml-example` to `vars.yml` and populate with your kube CA cert (*found in `/etc/kubernetes/pki/ca.crt` on kubeadm-built master nodes*), token (*extracted above*), and URL to API endpoint (*also can be extracted from the kubeconfig generated above*)
 4. Create the 4 pipelines by running something like this:
 
 ```
-fly -t concourse sp -c pipeline.yml -p nodebrady -l credentials.yml -v component=nodebrady
-fly -t concourse sp -c pipeline.yml -p parrot -l credentials.yml -v component=nodebrady
-fly -t concourse sp -c pipeline.yml -p phippy -l credentials.yml -v component=nodebrady
-fly -t concourse sp -c pipeline.yml -p captainkube -l credentials.yml -v component=nodebrady
+fly -t concourse sp -c pipeline.yml -p nodebrady -l vars.yml -v component=nodebrady
+fly -t concourse sp -c pipeline.yml -p parrot -l vars.yml -v component=nodebrady
+fly -t concourse sp -c pipeline.yml -p phippy -l vars.yml -v component=nodebrady
+fly -t concourse sp -c pipeline.yml -p captainkube -l vars.yml -v component=nodebrady
 
 fly -t concourse unpause-pipeline -p nodebrady
 fly -t concourse unpause-pipeline -p parrot
