@@ -14,11 +14,8 @@ run:
 
       # Perform the build using Kaniko
       /kaniko/executor  \
-      --dockerfile=/tmp/build/$DIR/git-source/$COMPONENT/Dockerfile \
+      --dockerfile=/tmp/build/$DIR/git-source/((component))/Dockerfile \
       --destination=doesnt/matter:we-are-not-pushing \
-      --context=/tmp/build/$DIR/git-source/$COMPONENT/ \
+      --context=/tmp/build/$DIR/git-source/((component))/ \
       --no-push \
       --tarPath=/tmp/build/$DIR/image/image.tar
-
-params:
-  COMPONENT: ((component))

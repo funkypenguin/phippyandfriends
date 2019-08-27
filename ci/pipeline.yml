@@ -42,6 +42,8 @@ jobs:
       # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component directory.
       - task: build-image
         file: git-source/ci/build-with-kaniko.yml
+        vars:
+          component: ((component))
 
       # This task uploads the image generated above into the registry
       - put: harbour
