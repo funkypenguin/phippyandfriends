@@ -1,4 +1,7 @@
 #!/busybox/sh
+set -x
+
+pwd
 
 # Retrieve the build directory which can vary across concourse workers
 DIR=`ls /tmp/build/`

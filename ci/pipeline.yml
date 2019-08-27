@@ -71,7 +71,7 @@ jobs:
             path: helm 
             args:
               - lint 
-              - git-source/phippy/charts/phippy
+              - git-source/((component))/charts/((component))
 
       - task: create manifest from chart
         config:
@@ -90,11 +90,11 @@ jobs:
               - --set
               - buildID=bananapants
               - --set
-              - image.repository=registry-internal.elpenguino.net/library/phippy
+              - image.repository=registry-internal.elpenguino.net/library/((component))
               - --set
               - image.tag=latest      
               - --output-dir=helm-generated-manifest
-              - git-source/phippy/charts/phippy                
+              - git-source/((component))/charts/((component))                
 
       - task: kubeval manifest
         config:
@@ -113,7 +113,7 @@ jobs:
 
       - put: kube-cluster 
         params:
-          kubectl: apply -f helm-generated-manifest/phippy/templates
+          kubectl: apply -f helm-generated-manifest/((component))/templates
           #wait_until_ready_selector: app=myapp
 
 
