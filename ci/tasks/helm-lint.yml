@@ -1,0 +1,12 @@
+inputs: 
+  - name: git-source
+platform: linux
+image_resource:
+  type: docker-image
+  source: { repository: dtzar/helm-kubectl }
+run: 
+  path: /bin/ash 
+  args:
+    - -c 
+    - |
+      helm lint git-source/((component))/charts/((component))

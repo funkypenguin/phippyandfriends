@@ -39,31 +39,23 @@ jobs:
       - get: git-source
         trigger: true
 
-      # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component directory.
+      # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component> directory.
       - task: build-image
-        file: git-source/ci/build-with-kaniko.yml
-        vars:
-          component: ((component))
+        file: git-source/ci/tasks/build-with-kaniko.yml
+        vars: { component: ((component)) }
 
       # This task uploads the image generated above into the registry
       - put: harbour
         params:
           image: image/image.tar
 
+      # This task runs "helm lint" against the helm chart found in <git-source>/<component>/charts/<component> directory.
       - task: helm lint chart
-        config:
-          inputs: 
-            - name: git-source
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: { repository: dtzar/helm-kubectl }
-          run: 
-            path: helm 
-            args:
-              - lint 
-              - git-source/((component))/charts/((component))
+        file: git-source/ci/tasks/helm-lint.yml
+        vars: { component: ((component)) }
 
+
+      # This task uses helm to generate kubernetes manifests from the supplied chart and values
       - task: create manifest from chart
         config:
           inputs: 
@@ -75,17 +67,17 @@ jobs:
             type: docker-image
             source: { repository: dtzar/helm-kubectl }
           run: 
-            path: helm 
+            path: /bin/ash 
             args:
-              - template 
-              - --set
-              - buildID=bananapants
-              - --set
-              - image.repository=registry-internal.elpenguino.net/library/((component))
-              - --set
-              - image.tag=latest      
-              - --output-dir=helm-generated-manifest
-              - git-source/((component))/charts/((component))                
+              - -c
+              - |
+                helm template \
+                  --set buildID=bananapants \
+                  --set image.repository=(registry-url))/((component)) \
+                  --set image.tag=latest \
+                  --output-dir=helm-generated-manifest \
+                  --git-source/((component))/charts/((component))
+
 
       - task: kubeval manifest
         config:
