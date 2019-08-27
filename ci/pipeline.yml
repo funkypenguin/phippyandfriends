@@ -1,0 +1,115 @@
+---
+resource_types:
+- name: kubernetes
+  type: docker-image
+  source:
+    repository: zlabjp/kubernetes-resource
+    tag: "1.15"
+
+resources:
+  - name: git-source
+    type: git
+    icon: github-circle
+    source:
+      uri: https://github.com/funkypenguin/phippyandfriends.git
+
+  - name: kube-cluster
+    type: kubernetes
+    icon: kubernetes
+    source:
+      server: {{kubernetes-url}}
+      namespace: dev
+      token: {{kubernetes-token}}
+      certificate_authority: {{kubernetes-cert}}
+
+  - name: harbour
+    type: registry-image
+    icon: pier-crane
+    source:
+      username: {{registry-username}}
+      password: {{registry-password}}
+      debug: false
+      repository: {{registry-url}}/phippy
+
+jobs:
+  - name: job
+    public: true
+    plan:
+      - get: git-source
+        trigger: true
+
+      - task: build-image
+        config:
+          inputs:
+            - name: git-source
+          outputs:
+            - name: image            
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
+          run:
+             path: git-source/ci/build-with-kaniko.sh
+
+      - put: harbour
+        params:
+          image: image/image.tar
+
+      - task: helm lint chart
+        config:
+          inputs: 
+            - name: git-source
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: { repository: dtzar/helm-kubectl }
+          run: 
+            path: helm 
+            args:
+              - lint 
+              - git-source/phippy/charts/phippy
+
+      - task: create manifest from chart
+        config:
+          inputs: 
+            - name: git-source
+          outputs:
+            - name: helm-generated-manifest
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: { repository: dtzar/helm-kubectl }
+          run: 
+            path: helm 
+            args:
+              - template 
+              - --set
+              - buildID=bananapants
+              - --set
+              - image.repository=registry-internal.elpenguino.net/library/phippy
+              - --set
+              - image.tag=latest      
+              - --output-dir=helm-generated-manifest
+              - git-source/phippy/charts/phippy                
+
+      - task: kubeval manifest
+        config:
+          inputs: 
+            - name: helm-generated-manifest
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: { repository: garethr/kubeval }
+          run: 
+            path: kubeval 
+            args:
+              - -d
+              - helm-generated-manifest
+
+
+      - put: kube-cluster 
+        params:
+          kubectl: apply -f helm-generated-manifest/phippy/templates
+          #wait_until_ready_selector: app=myapp
+
+
