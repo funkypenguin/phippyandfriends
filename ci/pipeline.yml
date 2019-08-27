@@ -1,18 +1,22 @@
 ---
 resource_types:
-- name: kubernetes
-  type: docker-image
-  source:
-    repository: zlabjp/kubernetes-resource
-    tag: "1.15"
+  # This is a community-provided (non-concourse) resource which allows deployment/deletion etc against a Kubernetes cluster
+  - name: kubernetes
+    type: docker-image
+    source:
+      repository: zlabjp/kubernetes-resource
+      tag: "1.15"
+
 
 resources:
+  # This is the git repo the source code is found in
   - name: git-source
     type: git
     icon: github-circle
     source:
       uri: https://github.com/funkypenguin/phippyandfriends.git
 
+  # This is the kube cluster we'll be controlling
   - name: kube-cluster
     type: kubernetes
     icon: kubernetes
@@ -22,6 +26,7 @@ resources:
       token: ((kubernetes-token))
       certificate_authority: ((kubernetes-cert))
 
+  # This is the container registry we'll be using
   - name: harbour
     type: registry-image
     icon: pier-crane
@@ -36,6 +41,7 @@ jobs:
   - name: job
     public: true
     plan:
+      # Get the git source
       - get: git-source
         trigger: true
 
@@ -54,30 +60,12 @@ jobs:
         file: git-source/ci/tasks/helm-lint.yml
         vars: { component: ((component)) }
 
-
       # This task uses helm to generate kubernetes manifests from the supplied chart and values
-      - task: create manifest from chart
-        config:
-          inputs: 
-            - name: git-source
-          outputs:
-            - name: helm-generated-manifest
-          platform: linux
-          image_resource:
-            type: docker-image
-            source: { repository: dtzar/helm-kubectl }
-          run: 
-            path: /bin/ash 
-            args:
-              - -c
-              - |
-                helm template \
-                  --set buildID=bananapants \
-                  --set image.repository=(registry-url))/((component)) \
-                  --set image.tag=latest \
-                  --output-dir=helm-generated-manifest \
-                  --git-source/((component))/charts/((component))
-
+      - task: create manifests from chart
+        file: git-source/ci/tasks/helm-lint.yml
+        vars: 
+          component: ((component))
+          registry-url: ((registry-url))
 
       - task: kubeval manifest
         config:
