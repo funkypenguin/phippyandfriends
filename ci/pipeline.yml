@@ -18,7 +18,6 @@ resources:
   # This is the kube cluster we'll be controlling
   - name: kube-cluster
     type: kubernetes
-    icon: github-circle
     source:
       server: ((kubernetes-url))
       namespace: dev
@@ -71,7 +70,7 @@ jobs:
           component: ((component))
           registry-url: ((registry-url))
           ingress-class: ((ingress-class))
-          base-domain-name: ((base-domain-name))
+          basedomain: ((basedomain))
 
       # This task runs "kubeval" against the generated manifests to ensure they're syntatically correct before applying to cluster
       - task: kubeval manifests
