@@ -1,4 +1,4 @@
-#!sh
+#!/busybox/sh
 
 # Retrieve the build directory which can vary across concourse workers
 DIR=`ls /tmp/build/`

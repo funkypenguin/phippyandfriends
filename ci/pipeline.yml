@@ -28,8 +28,9 @@ resources:
     source:
       username: {{registry-username}}
       password: {{registry-password}}
-      debug: false
-      repository: {{registry-url}}/phippy
+      debug: true
+      repository: registry-internal.elpenguino.net/library/phippy
+
 
 jobs:
   - name: job
@@ -38,6 +39,7 @@ jobs:
       - get: git-source
         trigger: true
 
+      # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component directory.
       - task: build-image
         config:
           inputs:
@@ -50,6 +52,8 @@ jobs:
             source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
           run:
              path: git-source/ci/build-with-kaniko.sh
+          params:
+            COMPONENT: ((component))
 
       - put: harbour
         params:
