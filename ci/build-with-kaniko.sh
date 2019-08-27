@@ -1,9 +1,12 @@
 #!/busybox/sh
 
+# Retrieve the build directory which can vary across concourse workers
+DIR=`ls /tmp/build/`
+
 # Perform the build using Kaniko
 /kaniko/executor  \
---dockerfile=git-source/$COMPONENT/Dockerfile \
+--dockerfile=/tmp/build/$DIR/git-source/$COMPONENT/Dockerfile \
 --destination=doesnt/matter:we-are-not-pushing \
---context=git-source/$COMPONENT/ \
+--context=/tmp/build/$DIR/git-source/$COMPONENT/ \
 --no-push \
---tarPath=image/image.tar
+--tarPath=/tmp/build/$DIR/image/image.tar
