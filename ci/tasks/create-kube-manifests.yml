@@ -15,6 +15,8 @@ run:
         --set buildID=`cat git-source/.git/ref` \
         --set image.repository=((registry-url))/((component)) \
         --set image.tag=`cat git-source/.git/ref` \
+        --set ingress.class=((ingress-class)) \
+        --set ingress.basedomainname=((base-domain-name)) \
         --name ((component)) \
         --output-dir=helm-generated-manifest \
         git-source/((component))/charts/((component))

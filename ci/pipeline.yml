@@ -41,7 +41,7 @@ jobs:
     plan:
       # Get the git source
       - get: git-source
-        trigger: true
+        trigger: false
 
       # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component> directory.
       - task: build-image
@@ -70,6 +70,8 @@ jobs:
         vars: 
           component: ((component))
           registry-url: ((registry-url))
+          ingress-class: ((ingress-class))
+          base-domain-name: ((base-domain-name))
 
       # This task runs "kubeval" against the generated manifests to ensure they're syntatically correct before applying to cluster
       - task: kubeval manifests
