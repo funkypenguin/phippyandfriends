@@ -40,7 +40,7 @@ jobs:
     plan:
       # Get the git source
       - get: git-source
-        trigger: true
+        trigger: false
 
       # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component> directory.
       - task: build-image

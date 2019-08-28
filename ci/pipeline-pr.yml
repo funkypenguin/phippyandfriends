@@ -16,16 +16,6 @@ resources:
       repository: funkypenguin/phippyandfriends
       access_token: ((github-access-token))
 
-  # This is the container registry we'll be using
-  - name: harbour
-    type: registry-image
-    icon: pier-crane
-    source:
-      username: ((registry-username))
-      password: ((registry-password))
-      debug: false
-      repository: ((registry-url))/((component))
-
 jobs:
   - name: launch-((component))
     public: true
