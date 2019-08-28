@@ -9,9 +9,4 @@ run:
   args:
     - -c 
     - |
-      helm lint pull-request/((component))/charts/((component))
-on_failure:
-  put: pull-request
-  params:
-    path: pull-request
-    status: failure            
+      helm lint pull-request/((component))/charts/((component))          

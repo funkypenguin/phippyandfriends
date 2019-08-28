@@ -19,9 +19,4 @@ run:
         --set ingress.basedomain=((basedomain)) \
         --name ((component)) \
         --output-dir=helm-generated-manifest \
-        pull-request/((component))/charts/((component))
-on_failure:
-  put: pull-request
-  params:
-    path: pull-request
-    status: failure      
+        pull-request/((component))/charts/((component))  

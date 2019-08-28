@@ -9,9 +9,4 @@ run:
   path: kubeval 
   args:
     - -d
-    - helm-generated-manifest
-on_failure:
-  put: pull-request
-  params:
-    path: pull-request
-    status: failure      
+    - helm-generated-manifest   

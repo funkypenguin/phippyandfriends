@@ -18,8 +18,3 @@ run:
         --context=/tmp/build/$DIR/pull-request/((component))/ \
         --no-push \
         --tarPath=/tmp/build/$DIR/image/image.tar
-on_failure:
-  put: pull-request
-  params:
-    path: pull-request
-    status: failure        

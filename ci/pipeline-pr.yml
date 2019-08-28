@@ -1,14 +1,14 @@
 ---
 resource_types:
   # This is a community-provided (non-concourse) resource which allows interacting with GitHub Pull Requests (PRs)
-  - name: git-source
+  - name: pull-request
     type: docker-image
     source:
       repository: teliaoss/github-pr-resource
 
 resources:
   # # These are PRs against the git repo the source code is found in
-  - name: git-source
+  - name: pull-request
     type: pull-request
     check_every: 24h
     webhook_token: ((webhook-token))
@@ -32,50 +32,69 @@ jobs:
     plan:
 
       # Get the pull request
-      - get: git-source
-        trigger: true
+      - get: pull-request
+        trigger: true         
 
       # Respond to the PR indicating the pipeline is pending
-      - put: git-source
+      - put: pull-request
         params:
-          path: git-source
+          path: pull-request
           status: pending
 
-      # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component> directory.
+      # This generic task takes a param "component", and builds the dockerfile found in the <pull-request>/<component> directory.
       - task: build-image
-        file: git-source/ci/tasks/build-with-kaniko.yml
+        file: pull-request/ci/tasks-pr/build-with-kaniko.yml
         vars: { component: ((component)) }
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure                
 
-      # This task uploads the image generated above into the registry, tagging with the commit sha of the container
-      - put: harbour
-        params:
-          image: image/image.tar
-          additional_tags: git-source/.git/ref
-
-      # This task runs "helm lint" against the helm chart found in <git-source>/<component>/charts/<component> directory.
+      # This task runs "helm lint" against the helm chart found in <pull-request>/<component>/charts/<component> directory.
       - task: helm lint chart
-        file: git-source/ci/tasks/helm-lint.yml      
+        file: pull-request/ci/tasks-pr/helm-lint.yml      
         vars: { component: ((component)) }
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure          
 
-      # This task runs "helm unittest" against the helm chart found in <git-source>/<component>/charts/<component> directory.
+      # This task runs "helm unittest" against the helm chart found in <pull-request>/<component>/charts/<component> directory.
       - task: helm unittest chart
-        file: git-source/ci/tasks/helm-unittest.yml      
+        file: pull-request/ci/tasks-pr/helm-unittest.yml      
         vars: { component: ((component)) }
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure          
 
       # This task uses helm to generate kubernetes manifests from the supplied chart and values
       - task: create manifests from chart
-        file: git-source/ci/tasks/create-kube-manifests.yml
+        file: pull-request/ci/tasks-pr/create-kube-manifests.yml
         vars: 
           component: ((component))
           registry-url: ((registry-url))
           ingress-class: ((ingress-class))
           basedomain: ((basedomain))
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure            
 
       # This task runs "kubeval" against the generated manifests to ensure they're syntatically correct before applying to cluster
       - task: kubeval manifests
-        file: git-source/ci/tasks/kubeval-manifests.yml
+        file: pull-request/ci/tasks-pr/kubeval-manifests.yml
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure          
 
-      - put: git-source
+      - put: pull-request
         params:
-          path: git-source
+          path: pull-request
           status: success

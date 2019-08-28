@@ -12,8 +12,3 @@ run:
       helm init --client-only
       helm plugin install https://github.com/lrills/helm-unittest
       helm unittest pull-request/((component))/charts/((component))
-on_failure:
-  put: pull-request
-  params:
-    path: pull-request
-    status: failure            
