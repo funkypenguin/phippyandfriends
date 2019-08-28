@@ -7,6 +7,12 @@ resource_types:
       repository: zlabjp/kubernetes-resource
       tag: "1.15"
 
+  # This is a community-provided (non-concourse) resource which allows interacting with GitHub Pull Requests (PRs)
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
 resources:
   # This is the git repo the source code is found in
   - name: git-source
