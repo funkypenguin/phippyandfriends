@@ -1,0 +1,25 @@
+inputs:
+  - name: pull-request
+outputs:
+  - name: image            
+platform: linux
+image_resource:
+  type: docker-image
+  source: {repository: "gcr.io/kaniko-project/executor", tag: "debug" }  
+run:
+    path: /busybox/sh
+    args:
+      - -c
+      - |
+        DIR=`ls /tmp/build/`
+        /kaniko/executor  \
+        --dockerfile=/tmp/build/$DIR/pull-request/((component))/Dockerfile \
+        --destination=doesnt/matter:we-are-not-pushing \
+        --context=/tmp/build/$DIR/pull-request/((component))/ \
+        --no-push \
+        --tarPath=/tmp/build/$DIR/image/image.tar
+on_failure:
+  put: pull-request
+  params:
+    path: pull-request
+    status: failure        

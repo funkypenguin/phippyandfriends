@@ -1,28 +1,20 @@
 ---
 resource_types:
-  # This is a community-provided (non-concourse) resource which allows deployment/deletion etc against a Kubernetes cluster
-  - name: kubernetes
+  # This is a community-provided (non-concourse) resource which allows interacting with GitHub Pull Requests (PRs)
+  - name: git-source
     type: docker-image
     source:
-      repository: zlabjp/kubernetes-resource
-      tag: "1.15"
+      repository: teliaoss/github-pr-resource
 
 resources:
-  # This is the git repo the source code is found in
+  # # These are PRs against the git repo the source code is found in
   - name: git-source
-    type: git
-    icon: github-circle
+    type: pull-request
+    check_every: 24h
+    webhook_token: ((webhook-token))
     source:
-      uri: https://github.com/funkypenguin/phippyandfriends.git
-
-  # This is the kube cluster we'll be controlling
-  - name: kube-cluster
-    type: kubernetes
-    source:
-      server: ((kubernetes-url))
-      namespace: dev
-      token: ((kubernetes-token))
-      certificate_authority: ((kubernetes-cert))
+      repository: funkypenguin/phippyandfriends
+      access_token: ((github-access-token))
 
   # This is the container registry we'll be using
   - name: harbour
@@ -33,14 +25,21 @@ resources:
       password: ((registry-password))
       debug: false
       repository: ((registry-url))/((component))
-      
+
 jobs:
   - name: launch-((component))
     public: true
     plan:
-      # Get the git source
+
+      # Get the pull request
       - get: git-source
         trigger: true
+
+      # Respond to the PR indicating the pipeline is pending
+      - put: git-source
+        params:
+          path: git-source
+          status: pending
 
       # This generic task takes a param "component", and builds the dockerfile found in the <git-source>/<component> directory.
       - task: build-image
@@ -75,11 +74,8 @@ jobs:
       # This task runs "kubeval" against the generated manifests to ensure they're syntatically correct before applying to cluster
       - task: kubeval manifests
         file: git-source/ci/tasks/kubeval-manifests.yml
-      
-      # This task applies the generated kube manifests to the cluster
-      - put: kube-cluster 
+
+      - put: git-source
         params:
-          kubectl: apply -f helm-generated-manifest/((component))/templates
-          #wait_until_ready_selector: app=myapp
-
-
+          path: git-source
+          status: success

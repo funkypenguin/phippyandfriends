@@ -1,0 +1,27 @@
+inputs: 
+- name: pull-request
+outputs:
+- name: helm-generated-manifest
+platform: linux
+image_resource:
+  type: docker-image
+  source: { repository: dtzar/helm-kubectl }
+run: 
+  path: /bin/ash 
+  args:
+    - -c
+    - |
+      helm template \
+        --set buildID=`cat pull-request/.git/ref` \
+        --set image.repository=((registry-url))/((component)) \
+        --set image.tag=`cat pull-request/.git/ref` \
+        --set ingress.class=((ingress-class)) \
+        --set ingress.basedomain=((basedomain)) \
+        --name ((component)) \
+        --output-dir=helm-generated-manifest \
+        pull-request/((component))/charts/((component))
+on_failure:
+  put: pull-request
+  params:
+    path: pull-request
+    status: failure      

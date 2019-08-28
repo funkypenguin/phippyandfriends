@@ -5,6 +5,8 @@ kubernetes-url: <url extracted from kubectl config>
 kubernetes-token: <paste token extrated from kubectl config here>
 ingress-class: nginx-external
 basedomain: elpenguino.net
+github-access-token: <your github token>
+webhook-token: <make-up-a-webhook-token,-tinkerbell!>
 kubernetes-cert: |
   -----BEGIN CERTIFICATE-----
   MIICyDCCAbCgAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl

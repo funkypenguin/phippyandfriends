@@ -1,0 +1,19 @@
+inputs: 
+  - name: pull-request
+platform: linux
+image_resource:
+  type: docker-image
+  source: { repository: dtzar/helm-kubectl }
+run: 
+  path: /bin/ash 
+  args:
+    - -c 
+    - |
+      helm init --client-only
+      helm plugin install https://github.com/lrills/helm-unittest
+      helm unittest pull-request/((component))/charts/((component))
+on_failure:
+  put: pull-request
+  params:
+    path: pull-request
+    status: failure            
