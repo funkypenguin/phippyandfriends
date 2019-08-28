@@ -6,7 +6,7 @@ image:
   useImagePullSecrets: false
   pullPolicy: IfNotPresent
 service:
-  externalPort: 80
+  externalPort: bananapants
   internalPort: 80
 ingress:
   enabled: true
